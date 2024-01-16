@@ -13,11 +13,6 @@ type PostgresClient struct {
 	logger *zap.Logger
 }
 
-type Database struct {
-	db     *sql.DB
-	logger *zap.Logger
-}
-
 type User struct {
 	ID       int64
 	Username string
