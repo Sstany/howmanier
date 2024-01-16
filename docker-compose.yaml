@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: "prod_db"
+      POSTGRES_USER: "prod_user"
+      POSTGRES_PASSWORD: "production_pass"
+    ports:
+        - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+volumes:
+    postgres:
