@@ -17,7 +17,7 @@ services:
         - "postgres"
     container_name: telegram-bot
     build:
-        dockerfile: cmd/Dockerfile
+        dockerfile: Dockerfile
         context: .
     environment:
         POSTGRES: postgresql://prod_user:production_pass@postgres:5432/prod_db?sslmode=disable
