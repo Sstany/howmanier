@@ -57,15 +57,11 @@ func (r *TelegramBot) process(update *tgbotapi.Update) error {
 
 	switch update.Message.Command() {
 	case "start":
-		r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID,"Привет, я бот для контроля продуктов в твоём холодильнике
-		/add- добавит продукт
-		/delite - удалить продукт из списка
-		/list - показать актуальный список продуктов
-		/whattoeat - поможет выбрать, что приготовить сегодня"))
+		r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, `Привет, я бот для контроля продуктов в твоём холодильнике`))
 	case "add":
 		r.handlerAdd(ctx, tgUser, update)
 	case "delite":
-		r.handlerDelite(ctx, tgUser, update)
+		r.handlerDelete(ctx, tgUser, update)
 	case "list":
 		r.handlerList(ctx, tgUser, update)
 	case "whattoeat":
@@ -80,7 +76,7 @@ func (r *TelegramBot) handlerAdd(ctx context.Context, user *db.User, update *tgb
 
 }
 
-func (r *TelegramBot) handlerDelite(ctx context.Context, user *db.User, update *tgbotapi.Update) {
+func (r *TelegramBot) handlerDelete(ctx context.Context, user *db.User, update *tgbotapi.Update) {
 	name := update.Message.CommandArguments()
 	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Удалил "+name))
 }
