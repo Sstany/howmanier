@@ -6,7 +6,7 @@ const (
 )
 
 const (
-	insertList = "INSERT INTO wishlists (id, owner_id, name) values ($1, $2, $3)"
+	insertList = "INSERT INTO fridge (id, owner_id) values ($1, $2)"
 )
 
 const (
@@ -15,4 +15,10 @@ const (
 		username text NOT NULL,
 		PRIMARY KEY (id)
 	  )`
+	queryInitList = `CREATE TABLE IF NOT EXISTS list(
+		id bigint NOT NULL,
+		PRIMARY KEY (id)
+		name text NOT NULL,
+		count int NOT NULL,
+	)`
 )

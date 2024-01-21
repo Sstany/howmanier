@@ -19,10 +19,11 @@ type User struct {
 	ListID   int64
 }
 
-type List struct {
-	ID      int64
-	OwnerID int64
-	Name    string
+type Product struct {
+	ID     int64
+	UserID int64
+	Name   string
+	Count  int
 }
 
 func NewPostgresClient(ctx context.Context, connStr string) *PostgresClient {
@@ -37,6 +38,11 @@ func NewPostgresClient(ctx context.Context, connStr string) *PostgresClient {
 	}
 
 	_, err = conn.ExecContext(ctx, queryInitUsers)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = conn.ExecContext(ctx, queryInitFridge)
 	if err != nil {
 		panic(err)
 	}
@@ -65,8 +71,8 @@ func (r *PostgresClient) FetchUser(ctx context.Context, user *User) error {
 	return nil
 }
 
-func (r *PostgresClient) List(ctx context.Context, wishlist *List) error {
-	_, err := r.conn.ExecContext(ctx, insertList, wishlist.ID, wishlist.OwnerID, wishlist.Name)
+func (r *PostgresClient) AddProduct(ctx context.Context, list *List) error {
+	_, err := r.conn.ExecContext(ctx, insertFridge, list.ID, list.OwnerID)
 	if err != nil {
 		return err
 	}
