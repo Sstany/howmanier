@@ -71,8 +71,8 @@ func (r *PostgresClient) FetchUser(ctx context.Context, user *User) error {
 	return nil
 }
 
-func (r *PostgresClient) AddProduct(ctx context.Context, list *List) error {
-	_, err := r.conn.ExecContext(ctx, insertFridge, list.ID, list.OwnerID)
+func (r *PostgresClient) AddProduct(ctx context.Context, product *Product) error {
+	_, err := r.conn.ExecContext(ctx, insertFridge, product.UserID, product.Name, product.Count)
 	if err != nil {
 		return err
 	}

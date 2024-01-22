@@ -7,6 +7,8 @@ import (
 	"howmanier/app/db"
 	"howmanier/app/sdk"
 	"math/rand"
+	"strconv"
+	"strings"
 
 	"os"
 	"time"
@@ -59,7 +61,7 @@ func (r *TelegramBot) process(update *tgbotapi.Update) error {
 	case "start":
 		r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, `Привет, я бот для контроля продуктов в твоём холодильнике`))
 	case "add":
-		r.handlerAdd(ctx, tgUser, update)
+		return r.handlerAdd(ctx, tgUser, update)
 	case "delite":
 		r.handlerDelete(ctx, tgUser, update)
 	case "list":
@@ -70,10 +72,24 @@ func (r *TelegramBot) process(update *tgbotapi.Update) error {
 
 	return nil
 }
-func (r *TelegramBot) handlerAdd(ctx context.Context, user *db.User, update *tgbotapi.Update) {
-	name := update.Message.CommandArguments()
-	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Добавил "+name))
+func (r *TelegramBot) handlerAdd(ctx context.Context, user *db.User, update *tgbotapi.Update) error {
+	args := update.Message.CommandArguments()
+	food := strings.Split(args, " ")
+	count, err := strconv.Atoi(food[1])
+	if err != nil {
+		return err
+	}
+	r.dbClient.AddProduct(ctx,
+		&db.Product{
+			UserID: user.ID,
+			Name:   food[0],
+			Count:  count,
+		},
+	)
 
+	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Добавил "+food[0]+" "+food[1]+"шт."))
+
+	return nil
 }
 
 func (r *TelegramBot) handlerDelete(ctx context.Context, user *db.User, update *tgbotapi.Update) {
