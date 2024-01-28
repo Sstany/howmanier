@@ -62,7 +62,7 @@ func (r *TelegramBot) process(update *tgbotapi.Update) error {
 		r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, `Привет, я бот для контроля продуктов в твоём холодильнике`))
 	case "add":
 		return r.handlerAdd(ctx, tgUser, update)
-	case "delite":
+	case "delete":
 		r.handlerDelete(ctx, tgUser, update)
 	case "list":
 		r.handlerList(ctx, tgUser, update)
@@ -74,11 +74,14 @@ func (r *TelegramBot) process(update *tgbotapi.Update) error {
 }
 func (r *TelegramBot) handlerAdd(ctx context.Context, user *db.User, update *tgbotapi.Update) error {
 	args := update.Message.CommandArguments()
+
 	food := strings.Split(args, " ")
+
 	count, err := strconv.Atoi(food[1])
 	if err != nil {
 		return err
 	}
+
 	r.dbClient.AddProduct(ctx,
 		&db.Product{
 			UserID: user.ID,
@@ -92,9 +95,27 @@ func (r *TelegramBot) handlerAdd(ctx context.Context, user *db.User, update *tgb
 	return nil
 }
 
-func (r *TelegramBot) handlerDelete(ctx context.Context, user *db.User, update *tgbotapi.Update) {
-	name := update.Message.CommandArguments()
-	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Удалил "+name))
+func (r *TelegramBot) handlerDelete(ctx context.Context, user *db.User, update *tgbotapi.Update) error {
+	args := update.Message.CommandArguments()
+
+	food := strings.Split(args, " ")
+
+	count, err := strconv.Atoi(food[1])
+	if err != nil {
+		return err
+	}
+
+	r.dbClient.DeleteProduct(ctx,
+		&db.Product{
+			UserID: user.ID,
+			Name:   food[0],
+			Count:  count,
+		},
+	)
+
+	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Удалил "+food[0]+" "+food[1]+"шт."))
+
+	return nil
 }
 
 func (r *TelegramBot) handlerList(ctx context.Context, user *db.User, update *tgbotapi.Update) {

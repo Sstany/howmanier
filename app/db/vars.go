@@ -7,6 +7,8 @@ const (
 
 const (
 	insertFridge = "INSERT INTO fridge (user_id, name, count) values ($1, $2, $3)"
+	deleteFridge = "UPDATE fridge SET count=count-$2 WHERE name=$1"
+	queryFridge  = "SELECT * FROM fridge WHERE name=$2"
 )
 
 const (
