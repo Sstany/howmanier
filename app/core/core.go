@@ -82,13 +82,15 @@ func (r *TelegramBot) handlerAdd(ctx context.Context, user *db.User, update *tgb
 		return err
 	}
 
-	r.dbClient.AddProduct(ctx,
+	if err := r.dbClient.AddProduct(ctx,
 		&db.Product{
 			UserID: user.ID,
 			Name:   food[0],
 			Count:  count,
 		},
-	)
+	); err != nil {
+		return err
+	}
 
 	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Добавил "+food[0]+" "+food[1]+"шт."))
 
