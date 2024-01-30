@@ -107,13 +107,15 @@ func (r *TelegramBot) handlerDelete(ctx context.Context, user *db.User, update *
 		return err
 	}
 
-	r.dbClient.DeleteProduct(ctx,
+	if err := r.dbClient.DeleteProduct(ctx,
 		&db.Product{
 			UserID: user.ID,
 			Name:   food[0],
 			Count:  count,
 		},
-	)
+	); err != nil {
+		return err
+	}
 
 	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Удалил "+food[0]+" "+food[1]+"шт."))
 

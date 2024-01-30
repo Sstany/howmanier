@@ -6,9 +6,9 @@ const (
 )
 
 const (
-	insertFridge = `INSERT INTO fridge (user_id, name, count) values ($1, $2, $3) 
-	 ON CONFLICT (name) DO UPDATE SET count=fridge.count+EXCLUDED.count`
-	deleteFridge = "UPDATE fridge SET count=count-$2 WHERE name=$1"
+	insertFridge = `INSERT INTO fridge (user_id, name, count) values ($1, $2, $3)	
+	 ON CONFLICT (name, user_id) DO UPDATE SET count=fridge.count+EXCLUDED.count`
+	deleteFridge = "UPDATE fridge SET count=count-$3 WHERE user_id=$1 AND name=$2"
 	queryFridge  = "SELECT * FROM fridge WHERE name=$2"
 )
 
@@ -20,10 +20,10 @@ const (
 	  )`
 	queryInitFridge = `CREATE TABLE IF NOT EXISTS fridge(
 		id serial UNIQUE,
-		user_id bigint NOT NULL,
-		name text UNIQUE,
+		user_id bigint 	UNIQUE NOT NULL,
+		name text NOT NULL,
 		count int NOT NULL,
-		PRIMARY KEY (name)
+		PRIMARY KEY (name, user_id)
 		
 	)`
 )

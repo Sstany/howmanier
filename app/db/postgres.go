@@ -81,10 +81,12 @@ func (r *PostgresClient) AddProduct(ctx context.Context, product *Product) error
 }
 
 func (r *PostgresClient) DeleteProduct(ctx context.Context, product *Product) error {
-	_, err := r.conn.ExecContext(ctx, deleteFridge, product.Name, product.Count)
+	_, err := r.conn.ExecContext(ctx, deleteFridge, product.UserID, product.Name, product.Count)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
+
+//func (r *PostgresClient) ListFridge(ctx context.Context)
