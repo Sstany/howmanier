@@ -74,25 +74,31 @@ func (r *TelegramBot) process(update *tgbotapi.Update) error {
 }
 func (r *TelegramBot) handlerAdd(ctx context.Context, user *db.User, update *tgbotapi.Update) error {
 	args := update.Message.CommandArguments()
+	switch {
+	case strings.Contains(args, " "):
+		food := strings.Split(args, " ")
 
-	food := strings.Split(args, " ")
+		count, err := strconv.Atoi(food[1])
+		if err != nil {
+			return err
+		}
 
-	count, err := strconv.Atoi(food[1])
-	if err != nil {
-		return err
+		if err := r.dbClient.AddProduct(ctx,
+			&db.Product{
+				UserID: user.ID,
+				Name:   food[0],
+				Count:  count,
+			},
+		); err != nil {
+			return err
+		}
+
+		r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Добавил "+food[0]+" "+food[1]+"шт."))
+
+	case strings.Contains(args, " ") == false:
+		r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Добавьте количество продукта или сам продукт"))
+
 	}
-
-	if err := r.dbClient.AddProduct(ctx,
-		&db.Product{
-			UserID: user.ID,
-			Name:   food[0],
-			Count:  count,
-		},
-	); err != nil {
-		return err
-	}
-
-	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Добавил "+food[0]+" "+food[1]+"шт."))
 
 	return nil
 }
@@ -100,24 +106,31 @@ func (r *TelegramBot) handlerAdd(ctx context.Context, user *db.User, update *tgb
 func (r *TelegramBot) handlerDelete(ctx context.Context, user *db.User, update *tgbotapi.Update) error {
 	args := update.Message.CommandArguments()
 
-	food := strings.Split(args, " ")
+	switch {
+	case strings.Contains(args, " "):
+		food := strings.Split(args, " ")
 
-	count, err := strconv.Atoi(food[1])
-	if err != nil {
-		return err
+		count, err := strconv.Atoi(food[1])
+		if err != nil {
+			return err
+		}
+
+		if err := r.dbClient.DeleteProduct(ctx,
+			&db.Product{
+				UserID: user.ID,
+				Name:   food[0],
+				Count:  count,
+			},
+		); err != nil {
+			return err
+		}
+
+		r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Удалил "+food[0]+" "+food[1]+"шт."))
+
+	case strings.Contains(args, " ") == false:
+		r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Добавьте количество продукта или сам продукт"))
+
 	}
-
-	if err := r.dbClient.DeleteProduct(ctx,
-		&db.Product{
-			UserID: user.ID,
-			Name:   food[0],
-			Count:  count,
-		},
-	); err != nil {
-		return err
-	}
-
-	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Удалил "+food[0]+" "+food[1]+"шт."))
 
 	return nil
 }
