@@ -89,4 +89,23 @@ func (r *PostgresClient) DeleteProduct(ctx context.Context, product *Product) er
 	return nil
 }
 
-//func (r *PostgresClient) ListFridge(ctx context.Context)
+func (r *PostgresClient) ListFridge(ctx context.Context, user *User) ([]Product, error) {
+	rows, err := r.conn.QueryContext(ctx, listFridge, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	var products []Product
+	var tempProduct Product
+
+	for rows.Next() {
+		if err := rows.Scan(&tempProduct.Name, &tempProduct.Count); err != nil {
+			return nil, err
+		}
+
+		products = append(products, tempProduct)
+
+	}
+
+	return products, nil
+}

@@ -65,7 +65,7 @@ func (r *TelegramBot) process(update *tgbotapi.Update) error {
 	case "delete":
 		r.handlerDelete(ctx, tgUser, update)
 	case "list":
-		r.handlerList(ctx, tgUser, update)
+		return r.handlerList(ctx, tgUser, update)
 	case "whattoeat":
 		r.handlerWhattoeat(update)
 	}
@@ -135,9 +135,28 @@ func (r *TelegramBot) handlerDelete(ctx context.Context, user *db.User, update *
 	return nil
 }
 
-func (r *TelegramBot) handlerList(ctx context.Context, user *db.User, update *tgbotapi.Update) {
+func (r *TelegramBot) handlerList(ctx context.Context, user *db.User, update *tgbotapi.Update) error {
 	//name:= update.Message.CommandArguments()
-	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Твой список: "))
+	products, err := r.dbClient.ListFridge(ctx, user)
+	if err != nil {
+		r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "АШИПКА"))
+		return err
+	}
+
+	out := strings.Builder{}
+	for i, product := range products {
+		out.WriteString(strconv.Itoa(i + 1))
+		out.WriteString(".  ")
+		out.WriteString(product.Name)
+		out.WriteString(" ")
+		out.WriteString(strconv.Itoa(product.Count))
+		out.WriteString("\n")
+
+	}
+
+	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, out.String()))
+
+	return nil
 }
 
 func (r *TelegramBot) handlerWhattoeat(update *tgbotapi.Update) {
