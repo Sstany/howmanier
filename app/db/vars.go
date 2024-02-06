@@ -12,6 +12,11 @@ const (
 	queryFridge  = "SELECT * FROM fridge WHERE name=$2"
 	listFridge   = `SELECT name,count FROM fridge WHERE user_id=$1`
 )
+const (
+	insertRecipe = `INSERT INTO recipes (user_id, recipe_name, name, count) values ($1,$2,$3,$4) 
+	ON CONFLICT (recipe_name, user_id) DO NOTHING`
+	listRecipes = `SELECT recipe_name FROM recipes WHERE user_id = $1`
+)
 
 const (
 	queryInitUsers = `CREATE TABLE IF NOT EXISTS users (
@@ -26,5 +31,13 @@ const (
 		count int NOT NULL,
 		PRIMARY KEY (name, user_id)
 		
+	)`
+	queryInitRecipes = `CREATE TABLE IF NOT EXISTS recipes(
+		id serial UNIQUE,
+		user_id bigint NOT NULL,
+		recipe_name text,
+		name text NOT NULL,
+		count int NOT NULL,
+		PRIMARY KEY (recipe_name, user_id)
 	)`
 )

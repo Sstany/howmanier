@@ -25,6 +25,13 @@ type Product struct {
 	Name   string
 	Count  int
 }
+type Recipe struct {
+	ID         int64
+	UserID     int64
+	RecipeName string
+	Name       string
+	Count      int
+}
 
 func NewPostgresClient(ctx context.Context, connStr string) *PostgresClient {
 	db, err := sql.Open("postgres", connStr)
@@ -43,6 +50,11 @@ func NewPostgresClient(ctx context.Context, connStr string) *PostgresClient {
 	}
 
 	_, err = conn.ExecContext(ctx, queryInitFridge)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = conn.ExecContext(ctx, queryInitRecipes)
 	if err != nil {
 		panic(err)
 	}
@@ -108,4 +120,12 @@ func (r *PostgresClient) ListFridge(ctx context.Context, user *User) ([]Product,
 	}
 
 	return products, nil
+}
+func (r *PostgresClient) AddRecipe(ctx context.Context, recipe *Recipe) error {
+	_, err := r.conn.ExecContext(ctx, insertRecipe, recipe.UserID, recipe.RecipeName, recipe.Name, recipe.Count)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

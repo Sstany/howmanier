@@ -68,6 +68,8 @@ func (r *TelegramBot) process(update *tgbotapi.Update) error {
 		return r.handlerList(ctx, tgUser, update)
 	case "whattoeat":
 		r.handlerWhattoeat(update)
+	case "addrecipe":
+		return r.handlerAddRecipe(ctx, tgUser, update)
 	}
 
 	return nil
@@ -163,6 +165,24 @@ func (r *TelegramBot) handlerWhattoeat(update *tgbotapi.Update) {
 	dish := []string{"пельмени", "шарлотка", "рис с мяосм", "голубцы", "суп с тефтельками", "курица с овощами"}
 	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, dish[rand.Intn(6)]))
 
+}
+func (r *TelegramBot) handlerAddRecipe(ctx context.Context, user *db.User, update *tgbotapi.Update) error {
+	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Добавь название рецепта"))
+	name := update.Message.CommandArguments()
+
+	r.bot.Send(tgbotapi.NewMessage(update.Message.From.ID, "Добавь инградиенты"))
+
+	if err := r.dbClient.AddRecipe(ctx,
+
+		&db.Recipe{
+			UserID:     user.ID,
+			RecipeName: name,
+		},
+	); err != nil {
+		return err
+	}
+
+	return nil
 }
 func (r *TelegramBot) Start() {
 	var err error
